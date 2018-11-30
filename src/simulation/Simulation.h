@@ -7,7 +7,7 @@
 #define N_SAMPLES 20
 #define GRAVITY_CONST 6.67e-11
 #define TIME_STEP 7e-2
-#define EPSILON 1e-11
+#define EPSILON 0.15
 
 class Simulation {
 public:

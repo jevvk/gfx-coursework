@@ -5,7 +5,7 @@
 
 #define DEG_TO_RAD M_PI / 180
 #define TURN_ANGLE 4.0 * DEG_TO_RAD
-#define RUN_SPEED 5.0
+#define RUN_SPEED 0.5
 #define MAX_ACCEL 20
 #define MUL_ACCEL 1.05
 

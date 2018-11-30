@@ -6,6 +6,7 @@ class Particle {
 public:
   Vec3 pos, vel, force, _force;
   float mass;
+  float radius;
   bool alive;
 
   void render();
