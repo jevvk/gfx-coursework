@@ -5,10 +5,10 @@
 
 #define SD_TRESHOLD 1.5
 
-class BarnesHut {
+class CPUBarnesHut {
 public:
-  BarnesHut(Vec3 origin, Vec3 box);
-  ~BarnesHut();
+  CPUBarnesHut(Vec3 origin, Vec3 box);
+  ~CPUBarnesHut();
 
   Vec3 origin, box;
 

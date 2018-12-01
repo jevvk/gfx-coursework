@@ -2,20 +2,20 @@
 #include <iostream>
 #include <algorithm>
 
-#include "simulation/barneshut/BarnesHut.h"
+#include "simulation/barneshut/CPUBarnesHut.h"
 
 #include "simulation/Simulation.h"
 
-BarnesHut::BarnesHut(Vec3 o, Vec3 b) {
+CPUBarnesHut::CPUBarnesHut(Vec3 o, Vec3 b) {
   origin = o;
   box = b;
 }
 
-BarnesHut::~BarnesHut() {
+CPUBarnesHut::~CPUBarnesHut() {
   delete tree;
 }
 
-void BarnesHut::update_forces(Particle* particles, int n) {
+void CPUBarnesHut::update_forces(Particle* particles, int n) {
   if (tree != NULL) {
     delete tree;
   }
@@ -45,7 +45,7 @@ void BarnesHut::update_forces(Particle* particles, int n) {
   }
 }
 
-void BarnesHut::_update_forces(Particle* particle, Octree* node) {
+void CPUBarnesHut::_update_forces(Particle* particle, Octree* node) {
   if (!particle->alive) {
     return;
   }
@@ -68,12 +68,12 @@ void BarnesHut::_update_forces(Particle* particle, Octree* node) {
   }
 }
 
-void BarnesHut::_calculate_force(Particle* particle, Octree* node, double dist) {
+void CPUBarnesHut::_calculate_force(Particle* particle, Octree* node, double dist) {
   double force = -GRAVITY_CONST * particle->mass * node->total_mass / (dist * dist);
   particle->force += force * (particle->pos - node->mass_center) / dist;
 }
 
-double BarnesHut::calculate_mass(Octree* node) {
+double CPUBarnesHut::calculate_mass(Octree* node) {
   if (!node->is_leaf()) {
     node->total_mass = 0;
 
@@ -89,7 +89,7 @@ double BarnesHut::calculate_mass(Octree* node) {
   return node->total_mass;
 }
 
-Vec3 BarnesHut::calculate_mass_center(Octree* node) {
+Vec3 CPUBarnesHut::calculate_mass_center(Octree* node) {
   if (!node->is_leaf()) {
     node->mass_center = Vec3(0, 0, 0);
     double mass_total = 0;

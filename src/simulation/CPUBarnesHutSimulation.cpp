@@ -12,7 +12,7 @@
 #define THRESHOLD_DISTANCE 1e-6
 
 CPUBarnesHutSimulation::CPUBarnesHutSimulation(Universe* universe) : Simulation(universe, 2000) {
-  barnes_hut = new BarnesHut(Vec3(ORIGIN_X, ORIGIN_Y, ORIGIN_Z), Vec3(BOX_X, BOX_Y, BOX_Z));
+  barnes_hut = new CPUBarnesHut(Vec3(ORIGIN_X, ORIGIN_Y, ORIGIN_Z), Vec3(BOX_X, BOX_Y, BOX_Z));
 }
 
 void CPUBarnesHutSimulation::step() {

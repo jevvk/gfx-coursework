@@ -2,7 +2,7 @@
 
 #include "universe/Universe.h"
 #include "simulation/Simulation.h"
-#include "simulation/barneshut/BarnesHut.h"
+#include "simulation/barneshut/CPUBarnesHut.h"
 
 #define ORIGIN_X 0
 #define ORIGIN_Y 0
@@ -20,7 +20,7 @@ public:
   void render();
 
 private:
-  BarnesHut* barnes_hut;
+  CPUBarnesHut* barnes_hut;
 
   void forward();
   void calculate_forces();
