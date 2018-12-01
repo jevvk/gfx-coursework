@@ -9,13 +9,11 @@
 #include "simulation/Simulation.h"
 #include "simulation/CPUNaiveSimulation.h"
 #include "simulation/CPUBarnesHutSimulation.h"
+#include "simulation/GPUBarnesHutSimulation.h"
 
 #include "universe/Universe.h"
 #include "universe/SimpleUniverse.cpp"
 // #include "universe/TwinCollisionUniverse.cpp"
-
-#include "shaders/simulation.frag.cpp"
-#include "shaders/simulation.vert.cpp"
 
 #define SCREEN_WIDTH 1600
 #define SCREEN_HEIGHT 900
@@ -143,6 +141,8 @@ void initiliase_world() {
     simulation = (Simulation*)(new CPUNaiveSimulation(universe));
   } else if (s_choice == CPU_BARNES_HUT) {
     simulation = (Simulation*)(new CPUBarnesHutSimulation(universe));
+  } else if (s_choice == GPU_BARNES_HUT) {
+    simulation = (Simulation*)(new GPUBarnesHutSimulation(universe));
   } else {
     exit(2);
   }
@@ -174,52 +174,6 @@ void reshape(int width, int height) {
   glLoadIdentity();
   gluPerspective(60, (GLdouble) width / (GLdouble) height, 10.0, 80000000.0);
 }
-
-// GLuint create_shader(GLenum type, const char* source) {
-//   GLuint shader = 0;
-//   GLint status;
-
-//   shader = glCreateShader(type);
-
-//   glShaderSource(shader, 1, (const GLchar**) &source, NULL);
-//   glCompileShader(shader);
-//   glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
-
-//   if (status != GL_TRUE) {
-//     std::cerr << "Failed to load shader." << std::endl;
-//     glDeleteShader(shader);
-//     exit(1);
-//   }
-
-//   return shader;
-// }
-
-// GLenum create_program() {
-//   GLuint vtx_shader_id = create_shader(GL_VERTEX_SHADER, _file_simulation_vert);
-//   GLuint frag_shader_id = create_shader(GL_VERTEX_SHADER, _file_simulation_frag);
-
-//   GLint status;
-
-//   program = glCreateProgram();
-
-//   glAttachShader(program, vtx_shader_id);
-//   glAttachShader(program, frag_shader_id);
-
-//   // bind attrib location and fragment data location???? what is this?
-
-//   glLinkProgram(program);
-//   glGetProgramiv(program, GL_LINK_STATUS, &status);
-
-//   // delete shader points, doesn't actually delete them internally (I hope)
-//   glDeleteShader(vtx_shader_id);
-//   glDeleteShader(frag_shader_id);
-
-//   if (status != GL_TRUE) {
-//     std::cerr << "Failed to link program." << std::endl;
-//     glDeleteProgram(program);
-//     exit(1);
-//   }
-// }
 
 void initialise_glut(int argc, char** argv) {
   glutInit(&argc, argv);

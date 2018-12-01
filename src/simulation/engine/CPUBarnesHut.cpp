@@ -2,7 +2,7 @@
 #include <iostream>
 #include <algorithm>
 
-#include "simulation/barneshut/CPUBarnesHut.h"
+#include "simulation/engine/CPUBarnesHut.h"
 
 #include "simulation/Simulation.h"
 

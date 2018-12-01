@@ -1,4 +1,4 @@
-#include "simulation/barneshut/Octree.h"
+#include "simulation/engine/Octree.h"
 
 Octree::Octree(Vec3 o, Vec3 b) {
   particle = NULL;

@@ -2,7 +2,7 @@
 
 #include "universe/Universe.h"
 #include "simulation/Simulation.h"
-#include "simulation/barneshut/CPUBarnesHut.h"
+#include "simulation/engine/CPUBarnesHut.h"
 
 #define ORIGIN_X 0
 #define ORIGIN_Y 0
@@ -17,7 +17,6 @@ public:
   CPUBarnesHutSimulation(Universe* universe);
 
   void step();
-  void render();
 
 private:
   CPUBarnesHut* barnes_hut;

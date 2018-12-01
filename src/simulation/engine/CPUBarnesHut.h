@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Particle.h"
-#include "simulation/barneshut/Octree.h"
+#include "simulation/engine/Octree.h"
 
 #define SD_TRESHOLD 1.5
 

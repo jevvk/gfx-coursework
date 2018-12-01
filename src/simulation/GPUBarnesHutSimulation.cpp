@@ -1,14 +1,19 @@
+#include <GL/glu.h>
+#include <GL/glut.h>
+
 #include "universe/Universe.h"
 #include "simulation/Simulation.h"
 
-class GPUBarnesHutSimulation : public Simulation {
-public:
-  GPUBarnesHutSimulation(Universe* universe) : Simulation(universe, 20000) {};
+#include "simulation/GPUBarnesHutSimulation.h"
 
-private:
-  Particle* particles;
+GPUBarnesHutSimulation::GPUBarnesHutSimulation(Universe* universe) : Simulation(universe, 20000) {
+  barneshut = new GPUBarnesHut(particles);
+}
 
-  float gravity_const = 6.67e-11;
-  float n_samples = 10;
-  float time_step = 1e-2;
-};
+void GPUBarnesHutSimulation::step() {
+  if (paused) {
+    return;
+  }
+
+  // forward();
+}

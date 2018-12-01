@@ -1,7 +1,7 @@
 # CC=g++ -fsplit-stack -std=c++17 -w -g -o
 CC=g++ -std=c++17 -w -g -o
 OUT=bin/main
-LIBRARIES=-Llib -lGLU -lGL -lglut
+LIBRARIES=-Llib -lGLU -lGL -lglut -lOpenCL
 INCLUDES=-Iinclude -Isrc
 
 coursework:

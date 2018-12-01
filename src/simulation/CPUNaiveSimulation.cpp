@@ -18,31 +18,6 @@ void CPUNaiveSimulation::step() {
   forward();
 }
 
-void CPUNaiveSimulation::render() {
-  // std::cout << "CPUNaiveSimulator: render" << std::endl; 
-
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
-
-  gluLookAt(camera->eyex, camera->eyey, camera->eyez,
-            camera->centerx, camera->centery, camera->centerz,
-            camera->upx, camera->upy, camera->upz);
-  
-  glPushMatrix();
-
-  Particle::begin_render();
-
-  for (int i = 0; i < n_particles; ++i) {
-    particles[i].render();
-  }
-
-  Particle::end_render();
-
-  glPopMatrix();
-
-  // draw_axes();
-}
-
 void CPUNaiveSimulation::calculate_forces() {
   for (int i = 0; i < n_particles; ++i) {
     Particle* P1 = &particles[i];
