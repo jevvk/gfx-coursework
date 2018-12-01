@@ -3,7 +3,7 @@
 
 class GPUBarnesHutSimulation : public Simulation {
 public:
-  GPUBarnesHutSimulation(Universe* universe) : Simulation(universe) {};
+  GPUBarnesHutSimulation(Universe* universe) : Simulation(universe, 20000) {};
 
 private:
   Particle* particles;

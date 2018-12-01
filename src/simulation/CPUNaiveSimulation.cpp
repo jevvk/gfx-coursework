@@ -32,7 +32,7 @@ void CPUNaiveSimulation::render() {
 
   Particle::begin_render();
 
-  for (int i = 0; i < N_PARTICLES; ++i) {
+  for (int i = 0; i < n_particles; ++i) {
     particles[i].render();
   }
 
@@ -44,14 +44,14 @@ void CPUNaiveSimulation::render() {
 }
 
 void CPUNaiveSimulation::calculate_forces() {
-  for (int i = 0; i < N_PARTICLES; ++i) {
+  for (int i = 0; i < n_particles; ++i) {
     Particle* P1 = &particles[i];
 
     // if (!P1->alive) {
     //   continue;
     // }
 
-    for (int j = i + 1; j < N_PARTICLES; ++j) {
+    for (int j = i + 1; j < n_particles; ++j) {
       Particle* P2 = &particles[j];
 
       // if (!P2->alive) {
@@ -86,7 +86,7 @@ void CPUNaiveSimulation::calculate_forces() {
 }
 
 void CPUNaiveSimulation::forward_1() {
-  for (int i = 0; i < N_PARTICLES; ++i) {
+  for (int i = 0; i < n_particles; ++i) {
     Particle* P = &particles[i];
 
     Vec3 acc = P->force / P->mass;
@@ -97,7 +97,7 @@ void CPUNaiveSimulation::forward_1() {
 }
 
 void CPUNaiveSimulation::forward_2() {
-  for (int i = 0; i < N_PARTICLES; ++i) {
+  for (int i = 0; i < n_particles; ++i) {
     Particle* P = &particles[i];
 
     Vec3 acc = P->force / P->mass;
@@ -108,7 +108,7 @@ void CPUNaiveSimulation::forward_2() {
 }
 
 void CPUNaiveSimulation::swap_forces() {
-  for (int i = 0; i < N_PARTICLES; ++i) {
+  for (int i = 0; i < n_particles; ++i) {
     Particle* P = &particles[i];
 
     P->_force = P->force;
@@ -116,7 +116,7 @@ void CPUNaiveSimulation::swap_forces() {
 }
 
 void CPUNaiveSimulation::forward() {
-  for (int i = 0; i < N_PARTICLES; ++i) {
+  for (int i = 0; i < n_particles; ++i) {
     Particle* P = &particles[i];
 
     P->force = Vec3(0, 0, 0);

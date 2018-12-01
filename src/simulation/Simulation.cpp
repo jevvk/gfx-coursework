@@ -5,10 +5,11 @@
 
 #include "simulation/Simulation.h"
 
-Simulation::Simulation(Universe* u) {
+Simulation::Simulation(Universe* u, int particle_count) {
   universe = u;
   paused = false;
-  particles = universe->generate(N_PARTICLES);
+  n_particles = particle_count;
+  particles = universe->generate(n_particles);
   camera = new Camera(universe->camera_position(), universe->camera_center());
 }
 
@@ -18,7 +19,7 @@ void Simulation::reset() {
   _reset();
   free(particles);
 
-  particles = universe->generate(N_PARTICLES);
+  particles = universe->generate(n_particles);
   paused = false;
 }
 
@@ -72,15 +73,6 @@ void Simulation::handle_key(unsigned char key) {
     std::cout << "Simulation: time step change " << time_step << std::endl;
     break;
 
-  case 'n':
-    n_samples += 1;
-    std::cout << "Simulation: samples change " << n_samples << std::endl;
-    break;
-  case 'N':
-    n_samples -= 1;
-    std::cout << "Simulation: samples change " << n_samples << std::endl;
-    break;
-  
   default:
     _handle_key(key);
     break;

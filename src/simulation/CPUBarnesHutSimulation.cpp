@@ -11,7 +11,7 @@
 
 #define THRESHOLD_DISTANCE 1e-6
 
-CPUBarnesHutSimulation::CPUBarnesHutSimulation(Universe* universe) : Simulation(universe) {
+CPUBarnesHutSimulation::CPUBarnesHutSimulation(Universe* universe) : Simulation(universe, 2000) {
   barnes_hut = new BarnesHut(Vec3(ORIGIN_X, ORIGIN_Y, ORIGIN_Z), Vec3(BOX_X, BOX_Y, BOX_Z));
 }
 
@@ -37,7 +37,7 @@ void CPUBarnesHutSimulation::render() {
 
   Particle::begin_render();
 
-  for (int i = 0; i < N_PARTICLES; ++i) {
+  for (int i = 0; i < n_particles; ++i) {
     particles[i].render();
   }
 
@@ -49,11 +49,11 @@ void CPUBarnesHutSimulation::render() {
 }
 
 void CPUBarnesHutSimulation::calculate_forces()  {
-  barnes_hut->update_forces(particles, N_PARTICLES);
+  barnes_hut->update_forces(particles, n_particles);
 }
 
 void CPUBarnesHutSimulation::forward_1() {
-  for (int i = 0; i < N_PARTICLES; ++i) {
+  for (int i = 0; i < n_particles; ++i) {
     Particle* P = &particles[i];
 
     Vec3 acc = P->force / P->mass;
@@ -64,7 +64,7 @@ void CPUBarnesHutSimulation::forward_1() {
 }
 
 void CPUBarnesHutSimulation::forward_2() {
-  for (int i = 0; i < N_PARTICLES; ++i) {
+  for (int i = 0; i < n_particles; ++i) {
     Particle* P = &particles[i];
 
     Vec3 acc = P->force / P->mass;
@@ -75,7 +75,7 @@ void CPUBarnesHutSimulation::forward_2() {
 }
 
 void CPUBarnesHutSimulation::swap_forces() {
-  for (int i = 0; i < N_PARTICLES; ++i) {
+  for (int i = 0; i < n_particles; ++i) {
     Particle* P = &particles[i];
 
     P->_force = P->force;
@@ -83,7 +83,7 @@ void CPUBarnesHutSimulation::swap_forces() {
 }
 
 void CPUBarnesHutSimulation::forward() {
-  for (int i = 0; i < N_PARTICLES; ++i) {
+  for (int i = 0; i < n_particles; ++i) {
     Particle* P = &particles[i];
 
     P->force = Vec3(0, 0, 0);

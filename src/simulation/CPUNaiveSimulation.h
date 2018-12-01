@@ -5,7 +5,7 @@
 
 class CPUNaiveSimulation : public Simulation {
 public:
-  CPUNaiveSimulation(Universe* universe) : Simulation(universe) {};
+  CPUNaiveSimulation(Universe* universe) : Simulation(universe, 200) {};
 
   void step();
   void render();
