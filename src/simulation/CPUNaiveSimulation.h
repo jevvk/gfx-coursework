@@ -13,8 +13,8 @@ public:
 private:
   void forward();
   void calculate_forces();
-  void forward_1(double time_step);
-  void forward_2(double time_step);
+  void forward_1();
+  void forward_2();
   void swap_forces();
 
   static void draw_axes();

@@ -20,16 +20,11 @@ void CPUBarnesHutSimulation::step() {
     return;
   }
 
-  calculate_forces();
-
-  // do multiple samples for better accuracy, but worse performance
-  for (int i = 0; i < n_samples; ++i) {
-    forward();
-  }
+  forward();
 }
 
 void CPUBarnesHutSimulation::render() {
-  std::cout << "CPUNaiveSimuCPUBarnesHutSimulationlator: render" << std::endl; 
+  // std::cout << "CPUNaiveSimuCPUBarnesHutSimulationlator: render" << std::endl; 
 
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
@@ -57,25 +52,25 @@ void CPUBarnesHutSimulation::calculate_forces()  {
   barnes_hut->update_forces(particles, N_PARTICLES);
 }
 
-void CPUBarnesHutSimulation::forward_1(double _time_step) {
+void CPUBarnesHutSimulation::forward_1() {
   for (int i = 0; i < N_PARTICLES; ++i) {
     Particle* P = &particles[i];
 
     Vec3 acc = P->force / P->mass;
-    Vec3 vel = acc / 2 * _time_step + P->vel;
+    Vec3 vel = acc / 2 * time_step + P->vel;
 
-    P->pos += vel * _time_step;
+    P->pos += vel * time_step;
   }
 }
 
-void CPUBarnesHutSimulation::forward_2(double _time_step) {
+void CPUBarnesHutSimulation::forward_2() {
   for (int i = 0; i < N_PARTICLES; ++i) {
     Particle* P = &particles[i];
 
     Vec3 acc = P->force / P->mass;
     Vec3 _acc = P->_force / P->mass;
 
-    P->vel += (acc + _acc) / 2 * _time_step;
+    P->vel += (acc + _acc) / 2 * time_step;
   }
 }
 
@@ -100,12 +95,10 @@ void CPUBarnesHutSimulation::forward() {
   // newAcceleration = force(time, position) / mass;
   // velocity += timestep * (acceleration + newAcceleration) / 2;
 
-  // 2 passes
-  double _time_step = ((double) time_step) / n_samples;
-
   // assumes it's already calculated
-  forward_1(_time_step);
+  calculate_forces();
+  forward_1();
   swap_forces();
   calculate_forces();
-  forward_2(_time_step);
+  forward_2();
 }
