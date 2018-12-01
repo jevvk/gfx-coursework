@@ -30,11 +30,26 @@ void BarnesHut::update_forces(Particle* particles, int n) {
   calculate_mass_center(tree);
 
   for (int i = 0; i < n; ++i) {
+    Particle* P  = &particles[i];
+
+    Vec3 min = origin - box / 2;
+    Vec3 max = origin + box / 2;
+
+    if ((min - P->pos).maxComponent() > 0 || (max - P->pos).minComponent() < 0) {
+      P->alive = false;
+    }
+  }
+
+  for (int i = 0; i < n; ++i) {
     _update_forces(&particles[i], tree);
   }
 }
 
 void BarnesHut::_update_forces(Particle* particle, Octree* node) {
+  if (!particle->alive) {
+    return;
+  }
+
   if (node->particle != NULL && node->particle != particle) {
     double dist = (particle->pos - node->mass_center).norm() + EPSILON;
     _calculate_force(particle, node, dist);
@@ -55,7 +70,7 @@ void BarnesHut::_update_forces(Particle* particle, Octree* node) {
 
 void BarnesHut::_calculate_force(Particle* particle, Octree* node, double dist) {
   double force = -GRAVITY_CONST * particle->mass * node->total_mass / (dist * dist);
-  particle->force += force * (particle->pos - node->mass_center);
+  particle->force += force * (particle->pos - node->mass_center) / dist;
 }
 
 double BarnesHut::calculate_mass(Octree* node) {
