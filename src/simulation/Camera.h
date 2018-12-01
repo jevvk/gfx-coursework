@@ -1,8 +1,10 @@
 #pragma once
 
+#include "Vec3.h"
+
 class Camera {
 public:
-  Camera();
+  Camera(Vec3 position, Vec3 center);
 
   void reset_acceleration();
   void increase_acceleration();

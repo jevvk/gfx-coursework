@@ -9,19 +9,19 @@
 #define MAX_ACCEL 20
 #define MUL_ACCEL 1.05
 
-Camera::Camera() {
+Camera::Camera(Vec3 pos, Vec3 center) {
   acceleration = 1.0;
 
   mlon = 0.0;
   mlat = 0.0;
 
-  eyex = 0.0; // probably have to change these 3
-  eyey = 200.0; // maybe use universe to set these
-  eyez = 50.0;
+  eyex = pos.x;
+  eyey = pos.y;
+  eyez = pos.z;
 
-  centerx = 0.0;
-  centery = 0.0;
-  centerz = 0.0;
+  centerx = center.x;
+  centery = center.y;
+  centerz = center.z;
 
   upx = 0.0;
   upy = 1.0;

@@ -7,9 +7,9 @@
 
 Simulation::Simulation(Universe* u) {
   universe = u;
-  camera = new Camera();
   paused = false;
   particles = universe->generate(N_PARTICLES);
+  camera = new Camera(universe->camera_position(), universe->camera_center());
 }
 
 void Simulation::reset() {

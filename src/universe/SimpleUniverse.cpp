@@ -3,10 +3,10 @@
 
 #include "universe/Universe.h"
 
-#define UNIVERSE_RADIUS 10.0
+#define UNIVERSE_RADIUS 100.0
 #define RADIUS_MINIMUM 0.2
 #define RADIUS_VARIANCE 0.15
-#define VEL_VARIANCE 2.5
+#define VEL_VARIANCE 20.5
 #define MASS_VARIANCE 3.5e10
 #define MASS_MINIMUM 5.0e10
 
@@ -23,6 +23,14 @@ static double frand() {
  **/
 class SimpleUniverse : public Universe {
 public:
+  Vec3 camera_position() {
+    return Vec3(1, UNIVERSE_RADIUS, UNIVERSE_RADIUS);
+  }
+
+  Vec3 camera_center() {
+    return Vec3(0, 0, 0);
+  }
+
   Particle* generate(int N) {
     std::cout << "SimpleUniverse: Generating " << N << " particles." << std::endl;
     std::cout << "SimpleUniverse: velocity variance (" << VEL_VARIANCE << "), mass VARIANCE (" << MASS_VARIANCE << ")" << std::endl;
