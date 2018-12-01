@@ -3,15 +3,13 @@
 #include "universe/Universe.h"
 #include "simulation/Camera.h"
 
-#define N_PARTICLES 300
-#define N_SAMPLES 20
 #define GRAVITY_CONST 6.67e-11
-#define TIME_STEP 7e-2
+#define TIME_STEP 7e-3
 #define EPSILON 0.15
 
 class Simulation {
 public:
-  Simulation(Universe* universe);
+  Simulation(Universe* universe, int particle_count);
 
   void reset();
   void handle_key(unsigned char key);
@@ -29,8 +27,8 @@ protected:
   bool paused = true;
   unsigned char last_key = 0;
 
+  int n_particles = 0;
   float gravity_const = GRAVITY_CONST;
-  float n_samples = N_SAMPLES;
   float time_step = TIME_STEP;
 
   virtual void _handle_key(unsigned char key) {};
