@@ -11,6 +11,7 @@ public:
 
   void render();
 
+  static void init();
   static void begin_render();
   static void end_render();
 };

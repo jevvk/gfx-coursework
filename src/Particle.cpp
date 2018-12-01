@@ -3,10 +3,17 @@
 
 #include "Particle.h"
 
+void Particle::init() {
+}
+
 void Particle::begin_render() {
 }
 
 void Particle::render() {
+  if (!alive) {
+    return;
+  }
+
   glColor3f(1.0, 1.0, 1.0);
   glPushMatrix();
   // glVertex3f(pos.x, pos.y, pos.z);
