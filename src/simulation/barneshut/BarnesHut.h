@@ -3,6 +3,8 @@
 #include "Particle.h"
 #include "simulation/barneshut/Octree.h"
 
+#define SD_TRESHOLD 1.5
+
 class BarnesHut {
 public:
   BarnesHut(Vec3 origin, Vec3 box);
@@ -13,7 +15,7 @@ public:
   void update_forces(Particle* particles, int n);
 
 private:
-  Octree* tree;
+  Octree* tree = NULL;
 
   void _update_forces(Particle* particle, Octree* node);
   void _calculate_force(Particle* particle, Octree* node, double dist);

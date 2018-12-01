@@ -1,4 +1,6 @@
 #pragma once
+#include <iostream>
+#include <algorithm>
 
 #include "simulation/barneshut/BarnesHut.h"
 
@@ -10,12 +12,12 @@ BarnesHut::BarnesHut(Vec3 o, Vec3 b) {
 }
 
 BarnesHut::~BarnesHut() {
-  Octree::free_tree(tree);
+  delete tree;
 }
 
 void BarnesHut::update_forces(Particle* particles, int n) {
-  if (tree != nullptr) {
-    Octree::free_tree(tree);
+  if (tree != NULL) {
+    delete tree;
   }
 
   tree = new Octree(origin, box);
@@ -24,21 +26,24 @@ void BarnesHut::update_forces(Particle* particles, int n) {
     tree->insert(&particles[i]);
   }
 
+  calculate_mass(tree);
+  calculate_mass_center(tree);
+
   for (int i = 0; i < n; ++i) {
     _update_forces(&particles[i], tree);
   }
 }
 
 void BarnesHut::_update_forces(Particle* particle, Octree* node) {
-  if (node->particle != nullptr && node->particle != particle) {
-    double dist = (particle->pos - node->mass_center).norm();
+  if (node->particle != NULL && node->particle != particle) {
+    double dist = (particle->pos - node->mass_center).norm() + EPSILON;
     _calculate_force(particle, node, dist);
   } else if (!node->is_leaf()) {
     double dist = (particle->pos - node->mass_center).norm();
-    double theta = node->half_dimension.x * 2 / dist; // why x?
+    double theta = std::max(node->half_dimension.x, std::max(node->half_dimension.y, node->half_dimension.z)) / dist;
 
-    if (theta < 0.5) {
-      _calculate_force(particle, node, dist);
+    if (theta < SD_TRESHOLD) {
+      _calculate_force(particle, node, dist + EPSILON);
       return;
     }
     
@@ -49,7 +54,7 @@ void BarnesHut::_update_forces(Particle* particle, Octree* node) {
 }
 
 void BarnesHut::_calculate_force(Particle* particle, Octree* node, double dist) {
-  double force = dist > EPSILON ? -GRAVITY_CONST * particle->mass * node->total_mass / (dist * dist) : 0;
+  double force = -GRAVITY_CONST * particle->mass * node->total_mass / (dist * dist);
   particle->force += force * (particle->pos - node->mass_center);
 }
 
@@ -60,7 +65,7 @@ double BarnesHut::calculate_mass(Octree* node) {
     for (int i = 0; i < 8; ++i) {
       node->total_mass += calculate_mass(node->children[i]);
     }
-  } else if (node->particle != nullptr) {
+  } else if (node->particle != NULL) {
     node->total_mass = node->particle->mass;
   } else {
     node->total_mass = 0;
@@ -75,7 +80,7 @@ Vec3 BarnesHut::calculate_mass_center(Octree* node) {
     double mass_total = 0;
 
     for (int i = 0; i < 8; ++i) {
-      if (node->is_leaf() && node->particle == nullptr) {
+      if (node->is_leaf() && node->particle == NULL) {
         continue;
       }
 
@@ -84,7 +89,7 @@ Vec3 BarnesHut::calculate_mass_center(Octree* node) {
     }
 
     node->mass_center = node->mass_center / mass_total;
-  } else if (node->particle != nullptr) {
+  } else if (node->particle != NULL) {
     node->mass_center = node->particle->pos;
   } else {
     node->mass_center = Vec3(0, 0, 0);
