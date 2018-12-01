@@ -120,7 +120,7 @@ void get_options(int argc, char * argv[]) {
         s_choice = CPU_NAIVE;
       } else if (std::strcmp(s_selection, "cpu-barnes-hut") == 0) {
         s_choice = CPU_BARNES_HUT;
-      } if (std::strcmp(s_selection, "gpu-naive") == 0) {
+      } else if (std::strcmp(s_selection, "gpu-naive") == 0) {
         s_choice = GPU_NAIVE;
       } else if (std::strcmp(s_selection, "gpu-barnes-hut") == 0) {
         s_choice = GPU_BARNES_HUT;
