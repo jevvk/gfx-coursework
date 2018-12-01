@@ -4,6 +4,8 @@
 
 #include <GL/glut.h>
 
+#include "Particle.h"
+
 #include "simulation/Simulation.h"
 #include "simulation/CPUNaiveSimulation.h"
 #include "simulation/CPUBarnesHutSimulation.h"
@@ -15,8 +17,8 @@
 #include "shaders/simulation.frag.cpp"
 #include "shaders/simulation.vert.cpp"
 
-#define SCREEN_WIDTH 1024
-#define SCREEN_HEIGHT 720
+#define SCREEN_WIDTH 1600
+#define SCREEN_HEIGHT 900
 #define MAX_FPS 60
 #define FRAME_INTERVAL 1000 / MAX_FPS
 
@@ -29,6 +31,9 @@ char** arg_end;
 
 enum UniverseChoice { RANDOM_SPHERE, TWIN_COLLISION };
 enum SimulationChoice { CPU_NAIVE, CPU_BARNES_HUT, GPU_NAIVE, GPU_BARNES_HUT };
+
+UniverseChoice u_choice = RANDOM_SPHERE;
+SimulationChoice s_choice = CPU_NAIVE;
 
 static void check_errors(char* str) {
   std::cout << str << " ";
@@ -48,10 +53,11 @@ static void check_errors(char* str) {
 }
 
 void print_usage() {
-	std::cout << "Usage: gfx-coursework [-h] [--universe UNIVERSE] [--simulation SIMULATION]\n";
+	std::cout << "Usage: gfx-coursework [-h] [--universe UNIVERSE] [--simulation SIMULATION] [--render RENDER]\n";
   std::cout << "Options: " << std::endl;
   std::cout << "\t" << "--universe" << "\t" << "twin (default), random" << std::endl;
   std::cout << "\t" << "--simulation" << "\t" << "cpu-naive, gpu-naive, cpu-barnes-hut, gpu-barnes-hut (default)" << std::endl;
+  std::cout << "\t" << "--render" << "\t" << "sphere(default), shader" << std::endl;
 }
 
 char* cmd_option_value(const std::string & option) {
@@ -91,9 +97,6 @@ void get_options(int argc, char * argv[]) {
     exit(0);
   }
 
-  UniverseChoice u_choice = TWIN_COLLISION;
-  SimulationChoice s_choice = CPU_NAIVE;
-
   {
     char* u_selection;
 
@@ -130,9 +133,19 @@ void get_options(int argc, char * argv[]) {
 }
 
 void initiliase_world() {
-  // TODO: configurability
-  universe = (Universe*) (new SimpleUniverse());
-  simulation = (Simulation*)(new CPUBarnesHutSimulation(universe));
+  if (u_choice == RANDOM_SPHERE) {
+    universe = (Universe*) (new SimpleUniverse());
+  } else {
+    exit(2);
+  }
+
+  if (s_choice == CPU_NAIVE) {
+    simulation = (Simulation*)(new CPUNaiveSimulation(universe));
+  } else if (s_choice == CPU_BARNES_HUT) {
+    simulation = (Simulation*)(new CPUBarnesHutSimulation(universe));
+  } else {
+    exit(2);
+  }
 }
 
 void display() {
@@ -224,6 +237,8 @@ void initialise_glut(int argc, char** argv) {
   glDepthFunc(GL_LEQUAL);
   glDisable(GL_CULL_FACE);
   glCullFace(GL_BACK);
+
+  Particle::init();
 }
 
 int main(int argc, char * argv[]) {
