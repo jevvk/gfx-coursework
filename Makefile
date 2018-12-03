@@ -1,8 +1,9 @@
 # CC=g++ -fsplit-stack -std=c++17 -w -g -o
 CC=g++ -std=c++17 -w -g -o
 OUT=bin/main
-LIBRARIES=-Llib -lGLU -lGL -lglut -lOpenCL
+LIBRARIES=-Llib -lGLU -lGL -lglut -ldl -lOpenCL
 INCLUDES=-Iinclude -Isrc
+EXTRAS=src/glad.c
 
 coursework:
 	python scripts/file2bytearray.py _file_simulation_frag src/shaders/simulation.frag src/shaders/simulation.frag.cpp
@@ -16,8 +17,14 @@ coursework:
 	python scripts/file2bytearray.py _file_sort_cl src/kernels/barneshut/sort.cl src/kernels/barneshut/sort.cl.cpp
 	python scripts/file2bytearray.py _file_summarizetree_cl src/kernels/barneshut/summarizetree.cl src/kernels/barneshut/summarizetree.cl.cpp
 
+	python scripts/bmp2bytearray.py _file_body_bmp src/textures/body.bmp src/textures/body.bmp.cpp
+
 	mkdir -p bin
-	$(CC) $(OUT) $(shell find src/ -name '*.cpp' -type f -print) $(LIBRARIES) ${INCLUDES}
+	$(CC) $(OUT) $(shell find src/ -name '*.cpp' -type f -print) $(EXTRAS) $(LIBRARIES) ${INCLUDES}
+
+	rm src/kernels/barneshut/*.cpp
+	rm src/shaders/*.cpp
+	rm src/textures/*.cpp
 
 clean:
 	rm -rf bin
