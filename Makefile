@@ -5,7 +5,7 @@ LIBRARIES=-Llib -lGLU -lGL -lglut -ldl -lOpenCL
 INCLUDES=-Iinclude -Isrc
 EXTRAS=src/glad.c
 
-coursework:
+convert:
 	python scripts/file2bytearray.py _file_simulation_frag src/shaders/simulation.frag src/shaders/simulation.frag.cpp
 	python scripts/file2bytearray.py _file_simulation_vert src/shaders/simulation.vert src/shaders/simulation.vert.cpp
 
@@ -19,12 +19,13 @@ coursework:
 
 	python scripts/bmp2bytearray.py _file_body_bmp src/textures/body.bmp src/textures/body.bmp.cpp
 
+compile:
 	mkdir -p bin
 	$(CC) $(OUT) $(shell find src/ -name '*.cpp' -type f -print) $(EXTRAS) $(LIBRARIES) ${INCLUDES}
 
+clean:
 	rm src/kernels/barneshut/*.cpp
 	rm src/shaders/*.cpp
 	rm src/textures/*.cpp
 
-clean:
-	rm -rf bin
+coursework: convert compile clean

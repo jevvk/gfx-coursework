@@ -15,7 +15,8 @@ p = p.reshape(-1, 4)[:, [0, 1, 2]].flatten()
 p = bytearray(p)
 
 array_string = ','.join('0x%02x'%i for i in p)
-result = """const char {name}[] = {{ {0} }};
+result = """#include "Files.h"
+const char {name}[] = {{ {0} }};
 const int {name}_width = {1};
 const int {name}_height = {2};
 """.format(array_string, height, width, name=name)
