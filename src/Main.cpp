@@ -2,9 +2,11 @@
 #include <cstring>
 #include <iostream>
 
+#include <glad/glad.h>
 #include <GL/glut.h>
 
 #include "Particle.h"
+#include "Constants.h"
 
 #include "simulation/Simulation.h"
 #include "simulation/CPUNaiveSimulation.h"
@@ -15,12 +17,6 @@
 #include "universe/SimpleUniverse.cpp"
 // #include "universe/TwinCollisionUniverse.cpp"
 
-#define SCREEN_WIDTH 1600
-#define SCREEN_HEIGHT 900
-#define MAX_FPS 60
-#define FRAME_INTERVAL 1000 / MAX_FPS
-
-GLuint program;
 Simulation* simulation;
 Universe* universe;
 
@@ -169,10 +165,12 @@ void timer(int) {
 }
 
 void reshape(int width, int height) {
-  glViewport(0, 0, width, height);
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  gluPerspective(60, (GLdouble) width / (GLdouble) height, 10.0, 80000000.0);
+  glutReshapeWindow(SCREEN_WIDTH, SCREEN_HEIGHT);
+
+  // glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+  // glMatrixMode(GL_PROJECTION);
+  // glLoadIdentity();
+  // gluPerspective(60, (GLdouble) SCREEN_WIDTH / (GLdouble) SCREEN_HEIGHT, 10.0, 80000000.0);
 }
 
 void initialise_glut(int argc, char** argv) {
@@ -180,6 +178,11 @@ void initialise_glut(int argc, char** argv) {
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
   glutCreateWindow("GFX coursework");
   glutReshapeWindow(SCREEN_WIDTH, SCREEN_HEIGHT);
+
+  if (!gladLoadGL()) {
+    std::cerr << "Failed to load OpenGL context." << std::endl;
+    exit(1);
+  }
 
   glutDisplayFunc(display);
   glutReshapeFunc(reshape);
@@ -191,6 +194,10 @@ void initialise_glut(int argc, char** argv) {
   glDepthFunc(GL_LEQUAL);
   glDisable(GL_CULL_FACE);
   glCullFace(GL_BACK);
+  glEnable(GL_POINT_SIZE);
+  glEnable(GL_TEXTURE_2D);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
   Particle::init();
 }
@@ -202,6 +209,8 @@ int main(int argc, char * argv[]) {
   initiliase_world();
   timer(0);
   glutMainLoop();
+
+  Particle::exit();
 
 	return 0;
 }

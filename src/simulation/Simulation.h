@@ -12,12 +12,12 @@ public:
   Simulation(Universe* universe, int particle_count);
 
   void reset();
-  void render();
   void handle_key(unsigned char key);
   void handle_specialkey(int key);
 
   virtual void _reset() {};
   virtual void step() {};
+  virtual void render();
 
 protected:
   Universe* universe;

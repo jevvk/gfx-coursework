@@ -4,6 +4,14 @@
 
 #include "simulation/engine/GPUBarnesHut.h"
 
+#include "kernels/barneshut/boundingbox.cl.cpp"
+#include "kernels/barneshut/buildtree.cl.cpp"
+#include "kernels/barneshut/calculateforce.cl.cpp"
+#include "kernels/barneshut/copyvertices.cl.cpp"
+#include "kernels/barneshut/integrate.cl.cpp"
+#include "kernels/barneshut/sort.cl.cpp"
+#include "kernels/barneshut/summarizetree.cl.cpp"
+
 GPUBarnesHut::GPUBarnesHut(Particle* particles) : particles(particles) {
   std::vector<cl::Platform> all_platforms;
   cl::Platform::get(&all_platforms);
@@ -12,7 +20,6 @@ GPUBarnesHut::GPUBarnesHut(Particle* particles) : particles(particles) {
     std::cout << "GPUBarnesHut: No platforms found. Check OpenCL installation." << std::endl;
     exit(1);
   }
-
   cl::Platform default_platform = all_platforms[0];
   std::cout << "GPUBarnesHut: Using platform " << default_platform.getInfo<CL_PLATFORM_NAME>() << std::endl;
 

@@ -16,6 +16,7 @@ void CPUNaiveSimulation::step() {
   }
 
   forward();
+  Particle::update_buffer(particles);
 }
 
 void CPUNaiveSimulation::calculate_forces() {

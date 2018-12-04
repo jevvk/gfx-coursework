@@ -11,6 +11,8 @@ Simulation::Simulation(Universe* u, int particle_count) {
   n_particles = particle_count;
   particles = universe->generate(n_particles);
   camera = new Camera(universe->camera_position(), universe->camera_center());
+
+  Particle::init_buffer(particles, n_particles);
 }
 
 void Simulation::reset() {
@@ -139,24 +141,28 @@ void Simulation::debug_camera() {
 void Simulation::render() {
   // std::cout << "Simulator: render" << std::endl; 
 
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
+  // glMatrixMode(GL_MODELVIEW);
+  // glLoadIdentity();
 
-  gluLookAt(camera->eyex, camera->eyey, camera->eyez,
-            camera->centerx, camera->centery, camera->centerz,
-            camera->upx, camera->upy, camera->upz);
+  // gluLookAt(camera->eyex, camera->eyey, camera->eyez,
+  //           camera->centerx, camera->centery, camera->centerz,
+  //           camera->upx, camera->upy, camera->upz);
   
-  glPushMatrix();
+  // glPushMatrix();
 
-  Particle::begin_render();
+  Particle::render_all(*camera);
 
-  for (int i = 0; i < n_particles; ++i) {
-    particles[i].render();
-  }
+  // glBegin(GL_POINTS);
+  // glPointSize(100);
+  // // temporary
+  // for (int i = 0; i < n_particles; ++i) {
+  //   glColor3f(1.0, 1.0, 1.0);
+  //   // glVertex3f(pos.x, pos.y, pos.z);
+  //   glVertex3f(particles[i].pos.x, particles[i].pos.y, particles[i].pos.z);
+  // }
+  // glEnd();
 
-  Particle::end_render();
-
-  glPopMatrix();
+  // glPopMatrix();
 
   // draw_axes();
 }
