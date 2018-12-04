@@ -25,7 +25,7 @@ GLuint Particle::vao = 0;
 GLuint Particle::vbo = 0;
 GLuint Particle::eab = 0;
 
-float* Particle::pos_buffer = NULL;
+float* Particle::buffer = NULL;
 int Particle::n_count = 0;
 
 glm::mat4 Particle::modelview = glm::mat4();
@@ -66,30 +66,28 @@ void Particle::init() {
   glDeleteShader(__gl_frag);
 
   // create texture
-  // glGenTextures(1, &__gl_tex);
-  // glBindTexture(GL_TEXTURE_2D, __gl_tex); 
+  glGenTextures(1, &__gl_tex);
+  glBindTexture(GL_TEXTURE_2D, __gl_tex); 
 
-  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
-  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-  // // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  // // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-  // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _file_body_bmp_width, _file_body_bmp_height, 0, GL_RGB, GL_UNSIGNED_BYTE, _file_body_bmp);
-  // glGenerateMipmap(GL_TEXTURE_2D);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _file_body_bmp_width, _file_body_bmp_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, _file_body_bmp);
+  glGenerateMipmap(GL_TEXTURE_2D);
 
   // assign texture
-  // glUseProgram(program);
-  // glUniform1i(glGetUniformLocation(program, "tex"), 0);
+  glUseProgram(program);
+  glUniform1i(glGetUniformLocation(program, "tex"), 0);
 
-  
-
-  glPointSize(3);
+  // glPointSize(5);
 }
 
 void Particle::init_buffer(Particle* particles, int count) {
   n_count = count;
-  pos_buffer = new float[n_count * 3];
+  buffer = new float[n_count * 3];
 
   glGenVertexArrays(1, &vao);
   glGenBuffers(1, &vbo);
@@ -100,7 +98,7 @@ void Particle::init_buffer(Particle* particles, int count) {
 
   update_buffer(particles);
 
-  glVertexAttribPointer(__gl_pos, 3, GL_FLOAT, GL_FALSE, 0, 0);
+  glVertexAttribPointer(__gl_pos, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
   glEnableVertexAttribArray(__gl_pos);
 }
 
@@ -108,18 +106,18 @@ void Particle::update_buffer(Particle* particles) {
   for (int i = 0; i < n_count; ++i) {
     Particle P = particles[i];
 
-    pos_buffer[i * 3] = P.pos.x;
-    pos_buffer[i * 3 + 1] = P.pos.y;
-    pos_buffer[i * 3 + 2] = P.pos.z;
+    buffer[i * 3] = P.pos.x;
+    buffer[i * 3 + 1] = P.pos.y;
+    buffer[i * 3 + 2] = P.pos.z;
   }
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(double) * 3 * n_count, pos_buffer, GL_DYNAMIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 3 * n_count, buffer, GL_DYNAMIC_DRAW);
 }
 
 void Particle::render_all(Camera cam) {
-  // glActiveTexture(GL_TEXTURE0);
-  // glBindTexture(GL_TEXTURE_2D, __gl_tex);
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, __gl_tex);
 
   glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 

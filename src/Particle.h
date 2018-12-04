@@ -28,13 +28,13 @@ private:
   static GLuint program;
   static unsigned int __gl_vert, __gl_frag;
   static unsigned int __gl_tex;
-  static unsigned int __gl_pos;
+  static unsigned int __gl_pos, __gl_vel;
   static unsigned int __gl_mv, __gl_proj;
   static unsigned int __gl_screensz, __gl_spritesz;
 
   static GLuint vbo, vao, eab;
 
-  static float* pos_buffer;
+  static float* buffer;
   static int n_count;
 
   static glm::mat4 modelview, projection;

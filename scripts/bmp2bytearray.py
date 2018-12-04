@@ -11,7 +11,7 @@ p = np.array(im)
 height = p.shape[1]
 width = p.shape[1]
 
-p = p.reshape(-1, 4)[:, [0, 1, 2]].flatten()
+p = p.reshape(-1, 4)[:, [0, 1, 2, 3]].flatten()
 p = bytearray(p)
 
 array_string = ','.join('0x%02x'%i for i in p)
