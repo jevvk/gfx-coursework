@@ -24,7 +24,7 @@ Camera::Camera(Vec3 pos, Vec3 center) {
   centerz = center.z;
 
   upx = 0.0;
-  upy = 1.0;
+  upy = -1.0;
   upz = 0.0;
 
   float dist = sqrt(eyex * eyex + eyey * eyey + eyez * eyez);

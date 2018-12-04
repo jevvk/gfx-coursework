@@ -25,7 +25,7 @@ GLuint Particle::vao = 0;
 GLuint Particle::vbo = 0;
 GLuint Particle::eab = 0;
 
-double* Particle::pos_buffer = NULL;
+float* Particle::pos_buffer = NULL;
 int Particle::n_count = 0;
 
 glm::mat4 Particle::modelview = glm::mat4();
@@ -82,23 +82,14 @@ void Particle::init() {
   // glUseProgram(program);
   // glUniform1i(glGetUniformLocation(program, "tex"), 0);
 
-  projection = glm::perspective(glm::radians(60.0f), (float) SCREEN_WIDTH / (float) SCREEN_HEIGHT, 10.0f, 80000000.0f);
-  __gl_proj = glGetUniformLocation(program, "projection");
-
-  glUniformMatrix4fv(__gl_proj, 1, GL_FALSE, glm::value_ptr(projection));
-
-  __gl_screensz = glGetUniformLocation(program, "screenSize");
-  __gl_spritesz = glGetUniformLocation(program, "spriteSize");
-
-  glUniform2f(__gl_screensz, screen.x, screen.y);
-  glUniform1f(__gl_spritesz, sprite_size);
+  
 
   glPointSize(3);
 }
 
 void Particle::init_buffer(Particle* particles, int count) {
   n_count = count;
-  pos_buffer = new double[n_count * 3];
+  pos_buffer = new float[n_count * 3];
 
   glGenVertexArrays(1, &vao);
   glGenBuffers(1, &vbo);
@@ -109,7 +100,7 @@ void Particle::init_buffer(Particle* particles, int count) {
 
   update_buffer(particles);
 
-  glVertexAttribPointer(__gl_pos, 3, GL_DOUBLE, GL_FALSE, 0, 0);
+  glVertexAttribPointer(__gl_pos, 3, GL_FLOAT, GL_FALSE, 0, 0);
   glEnableVertexAttribArray(__gl_pos);
 }
 
@@ -123,12 +114,25 @@ void Particle::update_buffer(Particle* particles) {
   }
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(pos_buffer), pos_buffer, GL_DYNAMIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(double) * 3 * n_count, pos_buffer, GL_DYNAMIC_DRAW);
 }
 
 void Particle::render_all(Camera cam) {
   // glActiveTexture(GL_TEXTURE0);
   // glBindTexture(GL_TEXTURE_2D, __gl_tex);
+
+  glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+  projection = glm::perspective(glm::radians(60.0f), (float) SCREEN_WIDTH / (float) SCREEN_HEIGHT, 10.0f, 80000000.0f);
+  __gl_proj = glGetUniformLocation(program, "projection");
+
+  glUniformMatrix4fv(__gl_proj, 1, GL_FALSE, glm::value_ptr(projection));
+
+  __gl_screensz = glGetUniformLocation(program, "screenSize");
+  __gl_spritesz = glGetUniformLocation(program, "spriteSize");
+
+  glUniform2f(__gl_screensz, screen.x, screen.y);
+  glUniform1f(__gl_spritesz, sprite_size);
 
   modelview = glm::lookAt(glm::vec3(cam.eyex, cam.eyey, cam.eyez),
                           glm::vec3(cam.centerx, cam.centery, cam.centerz),

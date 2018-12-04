@@ -34,7 +34,7 @@ private:
 
   static GLuint vbo, vao, eab;
 
-  static double* pos_buffer;
+  static float* pos_buffer;
   static int n_count;
 
   static glm::mat4 modelview, projection;
