@@ -3,12 +3,13 @@
 
 #include <GL/glut.h>
 
+#include "Config.h"
 #include "simulation/Simulation.h"
 
 Simulation::Simulation(Universe* u, int particle_count) {
   universe = u;
   paused = false;
-  n_particles = particle_count;
+  n_particles = n_bodies > 0 ? n_bodies : particle_count;
   particles = universe->generate(n_particles);
   camera = new Camera(universe->camera_position(), universe->camera_center());
 
