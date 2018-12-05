@@ -7,7 +7,7 @@
 #include "simulation/GPUBarnesHutSimulation.h"
 
 GPUBarnesHutSimulation::GPUBarnesHutSimulation(Universe* universe) : Simulation(universe, 20000) {
-  barneshut = new GPUBarnesHut(particles);
+  barneshut = new GPUBarnesHut(particles, n_particles);
 }
 
 void GPUBarnesHutSimulation::step() {
