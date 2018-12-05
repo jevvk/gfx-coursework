@@ -15,6 +15,8 @@ public:
   float radius;
   bool alive;
 
+  static GLuint vbo, vao, eab;
+
   static void init();
   static void exit();
   static void init_buffer(Particle* particles, int count);
@@ -31,8 +33,6 @@ private:
   static unsigned int __gl_pos, __gl_vel;
   static unsigned int __gl_mv, __gl_proj;
   static unsigned int __gl_screensz, __gl_spritesz;
-
-  static GLuint vbo, vao, eab;
 
   static float* buffer;
   static int n_count;
