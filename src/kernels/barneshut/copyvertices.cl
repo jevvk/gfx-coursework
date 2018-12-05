@@ -2,8 +2,6 @@
 #pragma OPENCL EXTENSION cl_khr_global_int32_extended_atomics : enable
 #pragma OPENCL EXTENSION cl_khr_local_int32_base_atomics : enable
 
-#include "kernels/nbody/debug.h"
-
 __attribute__ ((reqd_work_group_size(WORKGROUP_SIZE, 1, 1)))
 __kernel void copyVertices(
 	__global float* _posX, __global float* _posY, __global float* _posZ, __global float4* pos,

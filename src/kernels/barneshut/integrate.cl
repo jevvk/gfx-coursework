@@ -2,8 +2,6 @@
 #pragma OPENCL EXTENSION cl_khr_global_int32_extended_atomics : enable
 #pragma OPENCL EXTENSION cl_khr_local_int32_base_atomics : enable
 
-#include "kernels/nbody/debug.h"
-
 #define NULL_BODY (-1)
 #define LOCK (-2)
 
@@ -42,9 +40,6 @@ __kernel void integrate(
 		_velY[i] = velY + deltaVelY;
 		_velZ[i] = velZ + deltaVelZ;
 
-		DEBUG_PRINT(("velX[%d]: %f\n", i, _velX[i]));
-		DEBUG_PRINT(("velY[%d]: %f\n", i, _velY[i]));
-		DEBUG_PRINT(("velZ[%d]: %f\n", i, _velZ[i]));
 
 		/*
 		 _posX[i] += TIMESTEP * _velX[i] + 0.5f * TIMESTEP * TIMESTEP * _accX[i];

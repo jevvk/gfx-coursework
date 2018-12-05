@@ -64,8 +64,6 @@ void get_options(int argc, char * argv[]) {
         simulation_choice = CPU_NAIVE;
       } else if (std::strcmp(s_selection, "cpu-barnes-hut") == 0) {
         simulation_choice = CPU_BARNES_HUT;
-      } else if (std::strcmp(s_selection, "gpu-naive") == 0) {
-        simulation_choice = GPU_NAIVE;
       } else if (std::strcmp(s_selection, "gpu-barnes-hut") == 0) {
         simulation_choice = GPU_BARNES_HUT;
       } else {

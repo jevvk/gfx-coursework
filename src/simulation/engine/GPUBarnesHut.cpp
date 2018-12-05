@@ -8,21 +8,24 @@
 
 #include "simulation/engine/GPUBarnesHut.h"
 
-float* GPUBarnesHut::_posX_buffer = NULL;
-float* GPUBarnesHut::_posY_buffer = NULL;
-float* GPUBarnesHut::_posZ_buffer = NULL;
+#define MAX_COMPUTE_UNITS 16
+#define WARPSIZE 16
+#define WORKGROUP_SIZE 16
+#define NUM_WORK_GROUPS 16
 
-float* GPUBarnesHut::_velX_buffer = NULL;
-float* GPUBarnesHut::_velY_buffer = NULL;
-float* GPUBarnesHut::_velZ_buffer = NULL;
+// TODO: wtf is this
+int wtf_is_this_doing(int x, int y) {
+  int numberOfNodes = x * 2;
 
-float* GPUBarnesHut::_forceX_buffer = NULL;
-float* GPUBarnesHut::_forceY_buffer = NULL;
-float* GPUBarnesHut::_forceZ_buffer = NULL;
+  if (numberOfNodes < 1024 * y)
+    numberOfNodes = 1024 * y;
+  while ((numberOfNodes & (WARPSIZE - 1)) != 0)
+    ++numberOfNodes;
 
-float* GPUBarnesHut::_mass_buffer = NULL;
+  return numberOfNodes;
+}
 
-GPUBarnesHut::GPUBarnesHut(Particle* particles, int count) : particles(particles), n_particles(count) {
+GPUBarnesHut::GPUBarnesHut(Particle* particles, int count) : particles(particles), n_particles(count), n_nodes(wtf_is_this_doing(count, MAX_COMPUTE_UNITS)) {
   init_cl();
   init_buffers();
   init_gl_buffers();
@@ -31,12 +34,28 @@ GPUBarnesHut::GPUBarnesHut(Particle* particles, int count) : particles(particles
   set_kernels_args();
 }
 
+GPUBarnesHut::~GPUBarnesHut() {
+  free(_posX_buffer);
+  free(_posY_buffer);
+  free(_posZ_buffer);
+
+  free(_velX_buffer);
+  free(_velY_buffer);
+  free(_velZ_buffer);
+
+  free(_forceX_buffer);
+  free(_forceY_buffer);
+  free(_forceZ_buffer);
+
+  free(_mass_buffer);
+}
+
 void GPUBarnesHut::init_cl() {
   std::vector<cl::Platform> all_platforms;
   cl::Platform::get(&all_platforms);
   
   if (all_platforms.size() == 0) {
-    std::cout << "GPUBarnesHut: No platforms found. Check OpenCL installation." << std::endl;
+    std::cerr << "GPUBarnesHut: No platforms found. Check OpenCL installation." << std::endl;
     exit(1);
   }
 
@@ -47,31 +66,31 @@ void GPUBarnesHut::init_cl() {
   default_platform.getDevices(CL_DEVICE_TYPE_ALL, &all_devices);
 
   if (all_devices.size() == 0) {
-    std::cout << "GPUBarnesHut: No devices found. Check OpenCL installation." << std::endl;
+    std::cerr << "GPUBarnesHut: No devices found. Check OpenCL installation." << std::endl;
     exit(1);
   }
 
-  cl::Device default_device = all_devices[0];
-  std::cout << "GPUBarnesHut: Using device " << default_device.getInfo<CL_DEVICE_NAME>() << std::endl;
+  device = all_devices[0];
+  std::cout << "GPUBarnesHut: Using device " << device.getInfo<CL_DEVICE_NAME>() << std::endl;
+  std::cout << "GPUBarnesHut: Using device " << device.getInfo<CL_DEVICE_VERSION>() << std::endl;
 
-  context = cl::Context({ default_device });
+  context = cl::Context({ device });
 }
 
-// TODO: kernels have more buffers
 void GPUBarnesHut::init_buffers() {
-  _posX_buffer = new float[n_particles];
-  _posY_buffer = new float[n_particles];
-  _posZ_buffer = new float[n_particles];
+  _posX_buffer = new float[n_nodes + 1];
+  _posY_buffer = new float[n_nodes + 1];
+  _posZ_buffer = new float[n_nodes + 1];
 
-  _velX_buffer = new float[n_particles];
-  _velY_buffer = new float[n_particles];
-  _velZ_buffer = new float[n_particles];
+  _velX_buffer = new float[n_nodes + 1];
+  _velY_buffer = new float[n_nodes + 1];
+  _velZ_buffer = new float[n_nodes + 1];
 
-  _forceX_buffer = new float[n_particles];
-  _forceY_buffer = new float[n_particles];
-  _forceZ_buffer = new float[n_particles];
+  _forceX_buffer = new float[n_nodes + 1];
+  _forceY_buffer = new float[n_nodes + 1];
+  _forceZ_buffer = new float[n_nodes + 1];
 
-  _mass_buffer = new float[n_particles];
+  _mass_buffer = new float[n_nodes + 1];
 
   for (int i = 0; i < n_particles; ++i) {
     Particle P = particles[i];
@@ -88,6 +107,8 @@ void GPUBarnesHut::init_buffers() {
     _forceY_buffer[i] = 0;
     _forceZ_buffer[i] = 0;
   }
+
+  // TODO more buffers
 }
 
 // TODO
@@ -95,29 +116,56 @@ void GPUBarnesHut::init_cl_buffers() {
   
 }
 
-
 // TODO
 void GPUBarnesHut::init_gl_buffers() {
   
 }
 
 void GPUBarnesHut::load_kernels() {
-  // there has to be a better way
-  std::pair<const char*, long unsigned int> boundingbox = std::pair(_file_boundingbox_cl, _file_boundingbox_cl_length);
-  std::pair<const char*, long unsigned int> buildtree = std::pair(_file_buildtree_cl, _file_buildtree_cl_length);
-  std::pair<const char*, long unsigned int> calculateforce = std::pair(_file_calculateforce_cl, _file_calculateforce_cl_length);
-  std::pair<const char*, long unsigned int> copyvertices = std::pair(_file_copyvertices_cl, _file_copyvertices_cl_length);
-  std::pair<const char*, long unsigned int> integrate = std::pair(_file_integrate_cl, _file_integrate_cl_length);
-  std::pair<const char*, long unsigned int> sort = std::pair(_file_sort_cl, _file_sort_cl_length);
-  std::pair<const char*, long unsigned int> summarizetree = std::pair(_file_summarizetree_cl, _file_summarizetree_cl_length);
+  cl::Program::Sources sources;
 
-  std::vector<std::pair<const char*, long unsigned int>> kernels = { boundingbox, buildtree, calculateforce, copyvertices,
-                                       integrate, sort, summarizetree };
+  sources.push_back({ _file_boundingbox_cl, _file_boundingbox_cl_length });
+  sources.push_back({ _file_buildtree_cl, _file_buildtree_cl_length });
+  sources.push_back({ _file_calculateforce_cl, _file_calculateforce_cl_length });
+  sources.push_back({ _file_copyvertices_cl, _file_copyvertices_cl_length });
+  sources.push_back({ _file_integrate_cl, _file_integrate_cl_length });
+  sources.push_back({ _file_sort_cl, _file_sort_cl_length });
+  sources.push_back({ _file_summarizetree_cl, _file_summarizetree_cl_length });
 
-  program = cl::Program(context, kernels);
+  program = cl::Program(context, sources);
+
+  if (program.build({ device }, get_options().c_str()) != CL_SUCCESS) {
+    cl_int buildErr = CL_SUCCESS;
+    auto error = program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device, &buildErr);
+
+    std::cerr << "GPUBarnesHut: Couldn't compile OpenCL program." << std::endl;
+    std::cerr << error << std::endl;
+    exit(1);
+  }
+
+  if (program.createKernels(&kernels) != CL_SUCCESS) {
+    std::cerr << "GPUBarnesHut: Couldn't create OpenCL kernels." << std::endl;
+    exit(1);
+  }
 }
 
 // TODO
 void GPUBarnesHut::set_kernels_args() {
   
+}
+
+std::string GPUBarnesHut::get_options() {
+  std::string options = "-cl-std=CL2.0";
+  
+  options += " -D NUMBER_OF_NODES=";
+  options += std::to_string(n_nodes);
+
+  options += " -D NBODIES=";
+  options += std::to_string(n_particles);
+
+  options += " -D WORKGROUP_SIZE=";
+  options += std::to_string(WORKGROUP_SIZE);
+
+  options += " -D NUM_WORK_GROUPS=";
+  options += std::to_string(NUM_WORK_GROUPS);
 }

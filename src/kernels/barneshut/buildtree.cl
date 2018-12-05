@@ -2,8 +2,6 @@
 #pragma OPENCL EXTENSION cl_khr_global_int32_extended_atomics : enable
 #pragma OPENCL EXTENSION cl_khr_local_int32_base_atomics : enable
 
-#include "kernels/nbody/debug.h"
-
 #define NULL_BODY (-1)
 #define LOCK (-2)
 
@@ -18,10 +16,7 @@ __kernel void buildTree(
 		__global volatile int* _bottom, __global volatile float* _mass, __global volatile int* _child, __global int* _start, __global int* _sorted, __global int* _error) {
 
 	int localMaxDepth = 1;
-	DEBUG_PRINT(("- Info Buildtree -\n"));
 	const int stepSize = get_local_size(0) * get_num_groups(0);
-	DEBUG_PRINT(("NUMBER_OF_NODES: %d\n", NUMBER_OF_NODES));
-	DEBUG_PRINT(("NBODIES: %d\n", NBODIES));
 
 	// Cache root data 
 	float radius = *_radius;
@@ -29,10 +24,6 @@ __kernel void buildTree(
 	float rootY = _posY[NUMBER_OF_NODES];
 	float rootZ = _posZ[NUMBER_OF_NODES];
 
-	DEBUG_PRINT(("rootX: %f\n", rootX));
-	DEBUG_PRINT(("rootY: %f\n", rootY));
-	DEBUG_PRINT(("rootZ: %f\n", rootZ));
-	DEBUG_PRINT(("radius: %f\n", *_radius));
 	int childPath;
 
 	bool newBody = true;
@@ -40,10 +31,7 @@ __kernel void buildTree(
 
 	// iterate over all bodies assigned to this thread
 	int bodyIndex = get_global_id(0);
-	DEBUG_PRINT(("- Iterate over Bodies -\n"));
 	while (bodyIndex < NBODIES) {
-		DEBUG_PRINT(("bodyIndex: %d\n", bodyIndex));
-		DEBUG_PRINT(("\tnew body: %s\n", newBody ? "true" : "false"));
 		float currentR;
 		float bodyX, bodyY, bodyZ;
 		int depth;
@@ -55,7 +43,6 @@ __kernel void buildTree(
 			bodyX = _posX[bodyIndex];
 			bodyY = _posY[bodyIndex];
 			bodyZ = _posZ[bodyIndex];
-			DEBUG_PRINT(("\tbodyX: (%f, %f, %f)\n", bodyX, bodyY, bodyZ));
 
 			node = NUMBER_OF_NODES;
 			depth = 1;
@@ -66,12 +53,9 @@ __kernel void buildTree(
 			if (rootX < bodyX) childPath = 1;
 			if (rootY < bodyY) childPath += 2;
 			if (rootZ < bodyZ) childPath += 4;
-			DEBUG_PRINT(("\tchildPath: %d\n", childPath));
 		}
 
 		int childIndex = _child[NUMBER_OF_CELLS * node + childPath];
-		DEBUG_PRINT(("\tchildIndex: %d\n", childIndex));
-		DEBUG_PRINT(("\tfind leaf cell: %d\n", childIndex));
 
 		// follow path to leaf cell
 		while (childIndex >= NBODIES) {
@@ -88,27 +72,19 @@ __kernel void buildTree(
 			childIndex = _child[NUMBER_OF_CELLS * node + childPath];
 		}
 
-		DEBUG_PRINT(("\tleaf cell childIndex: %d\n", childIndex));
 
 		if (childIndex != LOCK) {
 			int locked = NUMBER_OF_CELLS * node + childPath;
-			DEBUG_PRINT(("\tlock: %d\n", locked));
-			DEBUG_PRINT(("\tnode: %d\n", node));
 			if (childIndex == atom_cmpxchg(&_child[locked], childIndex, LOCK)) { // try locking
 				if (childIndex == NULL_BODY) {
 					// no body has been here, so just insert
-					DEBUG_PRINT(("\t -> no body in cell - insert body %d at %d\n", bodyIndex, locked));
 					_child[locked] = bodyIndex;
 				} else {
-					DEBUG_PRINT(("\t -> childIndex %d already used\n", childIndex));
 					int patch = -1;
 					// Create new cell(s) and insert the old and new body
 					do {
 						depth++;
-						DEBUG_PRINT(("\t\titeration %d >= 0\n", childIndex));
 						const int cell = atom_dec(_bottom) - 1;
-						DEBUG_PRINT(("\t\tcell %d\n", cell));
-						DEBUG_PRINT(("\t\tnode: %d\n", node));
 						if (cell <= NBODIES) {
 
 							// TODO REPORT ERROR
@@ -120,7 +96,6 @@ __kernel void buildTree(
 						}
 						patch = max(patch, cell);
 
-						DEBUG_PRINT(("\t\tchildPath & 1: %d\n", childPath & 1));
 						float x = (childPath & 1) * currentR;
 						float y = ((childPath >> 1) & 1) * currentR;
 						float z = ((childPath >> 2) & 1) * currentR;
@@ -139,9 +114,6 @@ __kernel void buildTree(
 						for (int k = 0; k < NUMBER_OF_CELLS; k++) _child[cell * NUMBER_OF_CELLS + k] = -1;
 
 						if (patch != cell) {
-							DEBUG_PRINT(("\t\tinsert cell %d at %d\n", cell, NUMBER_OF_CELLS * node + childPath));
-							DEBUG_PRINT(("\t\t\tnode: %d\n", node));
-							DEBUG_PRINT(("\t\t\tchildpath: %d\n", childPath));
 							_child[NUMBER_OF_CELLS * node + childPath] = cell;
 						}
 
@@ -159,13 +131,8 @@ __kernel void buildTree(
 						if (z < bodyZ) childPath += 4;
 
 						childIndex = _child[NUMBER_OF_CELLS * node + childPath];
-						DEBUG_PRINT(("\t\tchildIndex: %d\n", childIndex));
-						DEBUG_PRINT(("\t\tnode: %d\n", node));
-						DEBUG_PRINT(("\t\t=======\n"));
 					}while (childIndex >= 0);
 
-					DEBUG_PRINT(("\tadded subtree push out\n"));
-					DEBUG_PRINT(("\tinsert body %d at %d\n", bodyIndex, NUMBER_OF_CELLS * node + childPath));
 					_child[NUMBER_OF_CELLS * node + childPath] = bodyIndex;
 
 					// TODO memory_order_seq_cst needed?

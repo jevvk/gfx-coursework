@@ -1,7 +1,7 @@
 #pragma once
 
 enum UniverseChoice { RANDOM_SPHERE, TWIN_COLLISION };
-enum SimulationChoice { CPU_NAIVE, CPU_BARNES_HUT, GPU_NAIVE, GPU_BARNES_HUT };
+enum SimulationChoice { CPU_NAIVE, CPU_BARNES_HUT, GPU_BARNES_HUT };
 
 extern UniverseChoice universe_choice;
 extern SimulationChoice simulation_choice;
