@@ -1,2 +1,5 @@
 .*/
 bin/
+src/kernels/**/*.cpp
+src/shaders/*.cpp
+src/textures/*.cpp
